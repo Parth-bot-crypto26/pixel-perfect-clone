@@ -1,8 +1,18 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Copy } from "lucide-react";
+import { ArrowRight, Copy, Check } from "lucide-react";
+import { useState } from "react";
 import aayushWide from "@/assets/aayush-wide-img.webp";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText("hello@aayushbharti.in");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <section
       id="hero-section"
@@ -35,14 +45,23 @@ const HeroSection = () => {
 
       {/* Stars/Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <div
+        {[...Array(30)].map((_, i) => (
+          <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-white/30 rounded-full animate-pulse-slow"
+            className="absolute w-1 h-1 bg-white/40 rounded-full"
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: [0.2, 0.8, 0.2],
+              scale: [1, 1.2, 1]
+            }}
+            transition={{
+              duration: 2 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2
+            }}
             style={{
               left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 4}s`,
+              top: `${Math.random() * 70}%`,
             }}
           />
         ))}
@@ -51,21 +70,24 @@ const HeroSection = () => {
       {/* Content */}
       <div className="container relative z-20 mx-auto mb-14 flex w-full flex-col items-center justify-center gap-y-6 px-4">
         {/* Upcoming Badge */}
-        <motion.a
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          href="#"
-          className="group flex cursor-pointer items-center gap-2 rounded-full border border-white/0 hover:bg-white/5 hover:border-white/15 text-sm backdrop-blur-sm transition-all duration-300 px-1 py-1"
         >
-          <span className="rounded-full bg-blue-600 px-2 py-0.5 text-white text-xs font-medium">
-            Upcoming
-          </span>
-          <span className="text-white/80 pr-2">
-            Nextnode is launching soon!
-          </span>
-          <ArrowRight className="w-4 h-4 text-white/60 group-hover:translate-x-1 transition-transform" />
-        </motion.a>
+          <Link
+            to="/projects"
+            className="group flex cursor-pointer items-center gap-2 rounded-full border border-white/0 hover:bg-white/5 hover:border-white/15 text-sm backdrop-blur-sm transition-all duration-300 px-1 py-1"
+          >
+            <span className="rounded-full bg-blue-600 px-2 py-0.5 text-white text-xs font-medium">
+              Upcoming
+            </span>
+            <span className="text-white/80 pr-2">
+              Nextnode is launching soon!
+            </span>
+            <ArrowRight className="w-4 h-4 text-white/60 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </motion.div>
 
         {/* Main Heading */}
         <motion.div
@@ -112,18 +134,21 @@ const HeroSection = () => {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="flex items-center gap-4 mt-4"
         >
-          <a
-            href="#contact"
+          <Link
+            to="/contact"
             className="group flex items-center gap-3 px-6 py-3 bg-white/10 hover:bg-white/15 border border-white/20 rounded-full text-white font-medium transition-all duration-300"
           >
             Let's Connect
             <div className="flex items-center justify-center w-8 h-8 bg-white/10 rounded-full group-hover:bg-white/20 transition-colors">
               <ArrowRight className="w-4 h-4" />
             </div>
-          </a>
-          <button className="flex items-center gap-2 px-4 py-3 text-white/70 hover:text-white transition-colors">
-            <Copy className="w-4 h-4" />
-            <span className="text-sm">hello@aayushbharti.in</span>
+          </Link>
+          <button 
+            onClick={handleCopyEmail}
+            className="flex items-center gap-2 px-4 py-3 text-white/70 hover:text-white transition-colors"
+          >
+            {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+            <span className="text-sm">{copied ? "Copied!" : "hello@aayushbharti.in"}</span>
           </button>
         </motion.div>
       </div>

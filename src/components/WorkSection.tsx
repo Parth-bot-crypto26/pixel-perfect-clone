@@ -138,11 +138,11 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
   const y = useMotionValue(0);
   const [isHovered, setIsHovered] = useState(false);
   
-  const mouseXSpring = useSpring(x);
-  const mouseYSpring = useSpring(y);
+  const mouseXSpring = useSpring(x, { stiffness: 400, damping: 40 });
+  const mouseYSpring = useSpring(y, { stiffness: 400, damping: 40 });
   
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["5deg", "-5deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-5deg", "5deg"]);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["4deg", "-4deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-4deg", "4deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
@@ -166,10 +166,10 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
       style={{
         rotateY,
         rotateX,
@@ -178,51 +178,60 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
-      className="group rounded-3xl p-6 md:p-8 border border-white/10 hover:border-white/20 transition-all duration-300"
-      // Dynamic background with project color
+      className="group rounded-3xl p-6 md:p-8 border border-white/10 hover:border-white/20 transition-all duration-300 relative overflow-hidden"
     >
-      <div 
-        className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-10 transition-opacity duration-500"
-        style={{ backgroundColor: project.color }}
+      {/* Background gradient on hover */}
+      <motion.div 
+        className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{ 
+          background: `radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${project.color}10, transparent 40%)`
+        }}
       />
       
       <div className="relative flex flex-col lg:flex-row gap-6">
         {/* Left Content */}
         <div className="lg:w-1/3 flex flex-col">
           <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <span className="text-3xl font-light text-white/30">{project.number}</span>
-              <span className="text-white/30">———</span>
-              <span className="text-xs text-white/50 uppercase tracking-wider">{project.type}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-4xl font-light text-white/20">{project.number}</span>
+              <div className="w-8 h-px bg-white/20" />
+              <span className="text-xs text-white/40 uppercase tracking-wider">{project.type}</span>
             </div>
-            <span className="px-3 py-1 text-xs text-white/60 bg-white/5 rounded-full border border-white/10">
+            <motion.span 
+              className="px-3 py-1 text-xs text-white/50 bg-white/5 rounded-full border border-white/10"
+              whileHover={{ scale: 1.05 }}
+            >
               {project.year}
-            </span>
+            </motion.span>
           </div>
           
           <Link 
             to={`/projects/${project.slug}`} 
             className="flex items-center gap-2 text-xl font-semibold text-white hover:text-white/80 transition-colors mb-4 group/link"
           >
-            {project.title}
-            <ArrowUpRight className="w-5 h-5 opacity-0 group-hover/link:opacity-100 transition-opacity" />
+            <span>{project.title}</span>
+            <ArrowUpRight className="w-5 h-5 opacity-0 group-hover/link:opacity-100 -translate-x-2 group-hover/link:translate-x-0 transition-all" />
           </Link>
           
-          <p className="text-white/60 text-sm mb-6 flex-1">{project.description}</p>
+          <p className="text-white/50 text-sm mb-6 flex-1 leading-relaxed">{project.description}</p>
           
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mt-auto">
-            {project.tags.slice(0, 6).map((tag) => (
-              <span
+            {project.tags.slice(0, 6).map((tag, i) => (
+              <motion.span
                 key={tag}
-                className="px-2 py-1 text-xs text-white/50 bg-white/5 rounded-md border border-white/5"
+                className="px-2.5 py-1 text-xs text-white/40 bg-white/5 rounded-md border border-white/5"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 + i * 0.05 }}
               >
                 {tag}
-              </span>
+              </motion.span>
             ))}
             {project.tags.length > 6 && (
-              <span className="px-2 py-1 text-xs text-white/50">
-                +{project.tags.length - 6} more
+              <span className="px-2 py-1 text-xs text-white/30">
+                +{project.tags.length - 6}
               </span>
             )}
           </div>
@@ -232,41 +241,63 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
         <div className="lg:w-2/3 relative">
           <Link 
             to={`/projects/${project.slug}`}
-            className="block rounded-2xl overflow-hidden bg-white/5 relative group/image"
+            className="block rounded-2xl overflow-hidden relative group/image"
             style={{ 
-              backgroundColor: `${project.color}15`,
-              borderColor: `${project.color}30`
+              backgroundColor: `${project.color}08`,
             }}
           >
-            <div className="flex gap-2 p-2">
+            <motion.div 
+              className="flex gap-2 p-3"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.3 }}
+            >
               {/* Primary Image */}
               <div className="flex-1 rounded-xl overflow-hidden">
-                <img
+                <motion.img
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-48 md:h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-48 md:h-64 object-cover"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.5 }}
                 />
               </div>
               {project.image2 && (
                 <div className="flex-1 rounded-xl overflow-hidden hidden md:block">
-                  <img
+                  <motion.img
                     src={project.image2}
                     alt={`${project.title} 2`}
-                    className="w-full h-48 md:h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-48 md:h-64 object-cover"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.5 }}
                   />
                 </div>
               )}
-            </div>
+            </motion.div>
             
             {/* View Button Overlay */}
             <motion.div 
-              className="absolute top-4 right-4 flex items-center gap-2 px-4 py-2 bg-white/90 text-black rounded-full text-sm font-medium opacity-0 group-hover/image:opacity-100 transition-opacity"
-              initial={{ scale: 0.8 }}
-              whileHover={{ scale: 1 }}
+              className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2 bg-white text-black rounded-full text-sm font-medium shadow-lg"
+              initial={{ opacity: 0, scale: 0.8, y: -10 }}
+              animate={{ 
+                opacity: isHovered ? 1 : 0, 
+                scale: isHovered ? 1 : 0.8,
+                y: isHovered ? 0 : -10
+              }}
+              transition={{ duration: 0.2 }}
             >
               View
               <ArrowRight className="w-4 h-4" />
             </motion.div>
+            
+            {/* Colored border on hover */}
+            <motion.div 
+              className="absolute inset-0 rounded-2xl pointer-events-none"
+              style={{ 
+                border: `2px solid ${project.color}`,
+                opacity: isHovered ? 0.3 : 0
+              }}
+              transition={{ duration: 0.3 }}
+            />
           </Link>
         </div>
       </div>
@@ -285,14 +316,14 @@ const WorkSection = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="text-sm text-white/50 uppercase tracking-wider">CASE STUDIES</span>
-          <h2 className="text-4xl md:text-5xl font-light text-white mt-2">
-            Curated <span className="serif-italic text-pink-400">work</span>
+          <span className="text-sm text-white/50 uppercase tracking-[0.2em]">CASE STUDIES</span>
+          <h2 className="text-4xl md:text-5xl font-light text-white mt-3">
+            Curated <span className="serif-italic text-pink-400">Work</span>
           </h2>
         </motion.div>
 
         {/* Projects Grid */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {projects.slice(0, 5).map((project, index) => (
             <ProjectCard key={project.title} project={project} index={index} />
           ))}
@@ -303,11 +334,11 @@ const WorkSection = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="text-center mt-12"
+          className="text-center mt-16"
         >
           <Link
             to="/work"
-            className="inline-flex items-center gap-2 px-6 py-3 text-white/70 hover:text-white transition-colors border border-white/10 rounded-full hover:border-white/20"
+            className="inline-flex items-center gap-2 px-6 py-3 text-white/60 hover:text-white transition-all border border-white/10 rounded-full hover:border-white/20 hover:bg-white/5"
           >
             See more projects
             <ArrowUpRight className="w-4 h-4" />

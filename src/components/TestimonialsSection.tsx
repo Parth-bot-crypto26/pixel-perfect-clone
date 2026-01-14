@@ -47,7 +47,7 @@ const testimonials = [
 
 const TestimonialsSection = () => {
   return (
-    <section className="relative z-10 px-4 py-20">
+    <section className="relative z-10 px-4 py-24">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <motion.div
@@ -56,9 +56,9 @@ const TestimonialsSection = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="text-sm text-white/50 uppercase tracking-wider">TESTIMONIALS</span>
-          <h2 className="text-4xl md:text-5xl font-light text-white mt-2">
-            Word on the street <span className="serif-italic">about me</span>
+          <span className="text-sm text-white/50 uppercase tracking-[0.2em]">TESTIMONIALS</span>
+          <h2 className="text-4xl md:text-5xl font-light text-white mt-3">
+            Word on the street <span className="serif-italic text-pink-400">about me</span>
           </h2>
         </motion.div>
 
@@ -67,27 +67,36 @@ const TestimonialsSection = () => {
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={testimonial.name}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-card rounded-3xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+              className="group bg-card rounded-3xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
             >
-              <h4 className="text-lg font-semibold text-white mb-4">
-                {testimonial.title}
-              </h4>
-              <p className="text-white/60 text-sm leading-relaxed mb-6 line-clamp-3">
+              <motion.h4 
+                className="text-lg font-semibold text-white mb-4 leading-snug"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 + 0.2 }}
+              >
+                "{testimonial.title}"
+              </motion.h4>
+              <p className="text-white/50 text-sm leading-relaxed mb-6 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
                 {testimonial.content}
               </p>
               <div className="flex items-center gap-3">
-                <img
+                <motion.img
                   src={testimonial.image}
                   alt={testimonial.name}
-                  className="w-10 h-10 rounded-full object-cover"
+                  className="w-11 h-11 rounded-full object-cover border-2 border-white/10"
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.2 }}
                 />
                 <div>
                   <p className="text-sm font-medium text-white">{testimonial.name}</p>
-                  <p className="text-xs text-white/50">{testimonial.role}</p>
+                  <p className="text-xs text-white/40">{testimonial.role}</p>
                 </div>
               </div>
             </motion.div>

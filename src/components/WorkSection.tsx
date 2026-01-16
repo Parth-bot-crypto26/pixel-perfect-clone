@@ -131,7 +131,7 @@ export const projects = [
   },
 ];
 
-// Tilt card component for projects
+// Project Card with 3D tilt, color glow, and smooth hover animations
 const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: number }) => {
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
@@ -141,8 +141,8 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
   const mouseXSpring = useSpring(x, { stiffness: 400, damping: 40 });
   const mouseYSpring = useSpring(y, { stiffness: 400, damping: 40 });
   
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["4deg", "-4deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-4deg", "4deg"]);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["5deg", "-5deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-5deg", "5deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
@@ -166,10 +166,10 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.7, delay: index * 0.1, ease: "easeOut" }}
       style={{
         rotateY,
         rotateX,
@@ -178,127 +178,152 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
-      className="group rounded-3xl p-6 md:p-8 border border-white/10 hover:border-white/20 transition-all duration-300 relative overflow-hidden"
+      className="group rounded-3xl border border-white/10 hover:border-white/20 transition-all duration-500 relative overflow-hidden bg-card/50"
     >
-      {/* Background gradient on hover */}
+      {/* Background gradient glow on hover */}
       <motion.div 
-        className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        className="absolute inset-0 rounded-3xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700"
         style={{ 
-          background: `radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${project.color}10, transparent 40%)`
+          background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${project.color}15, transparent 40%)`
         }}
       />
       
-      <div className="relative flex flex-col lg:flex-row gap-6">
-        {/* Left Content */}
-        <div className="lg:w-1/3 flex flex-col">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <span className="text-4xl font-light text-white/20">{project.number}</span>
-              <div className="w-8 h-px bg-white/20" />
-              <span className="text-xs text-white/40 uppercase tracking-wider">{project.type}</span>
+      {/* Color accent line on left */}
+      <motion.div 
+        className="absolute left-0 top-0 bottom-0 w-1 rounded-l-3xl"
+        style={{ backgroundColor: project.color }}
+        initial={{ scaleY: 0 }}
+        whileInView={{ scaleY: 1 }}
+        viewport={{ once: true }}
+        transition={{ delay: index * 0.1 + 0.3, duration: 0.5 }}
+      />
+      
+      <div className="relative p-6 md:p-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left Content */}
+          <div className="lg:w-2/5 flex flex-col">
+            <div className="flex items-center gap-4 mb-5">
+              <motion.span 
+                className="text-5xl font-extralight"
+                style={{ color: `${project.color}60` }}
+                whileHover={{ scale: 1.1, color: project.color }}
+              >
+                {project.number}
+              </motion.span>
+              <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent" />
+              <span className="text-xs text-white/40 uppercase tracking-wider font-medium">{project.type}</span>
             </div>
+            
             <motion.span 
-              className="px-3 py-1 text-xs text-white/50 bg-white/5 rounded-full border border-white/10"
-              whileHover={{ scale: 1.05 }}
+              className="px-3 py-1.5 text-xs text-white/60 bg-white/5 rounded-full border border-white/10 w-fit mb-5"
+              whileHover={{ scale: 1.05, borderColor: `${project.color}50` }}
             >
               {project.year}
             </motion.span>
-          </div>
-          
-          <Link 
-            to={`/projects/${project.slug}`} 
-            className="flex items-center gap-2 text-xl font-semibold text-white hover:text-white/80 transition-colors mb-4 group/link"
-          >
-            <span>{project.title}</span>
-            <ArrowUpRight className="w-5 h-5 opacity-0 group-hover/link:opacity-100 -translate-x-2 group-hover/link:translate-x-0 transition-all" />
-          </Link>
-          
-          <p className="text-white/50 text-sm mb-6 flex-1 leading-relaxed">{project.description}</p>
-          
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 mt-auto">
-            {project.tags.slice(0, 6).map((tag, i) => (
-              <motion.span
-                key={tag}
-                className="px-2.5 py-1 text-xs text-white/40 bg-white/5 rounded-md border border-white/5"
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 + i * 0.05 }}
-              >
-                {tag}
-              </motion.span>
-            ))}
-            {project.tags.length > 6 && (
-              <span className="px-2 py-1 text-xs text-white/30">
-                +{project.tags.length - 6}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Right Images */}
-        <div className="lg:w-2/3 relative">
-          <Link 
-            to={`/projects/${project.slug}`}
-            className="block rounded-2xl overflow-hidden relative group/image"
-            style={{ 
-              backgroundColor: `${project.color}08`,
-            }}
-          >
-            <motion.div 
-              className="flex gap-2 p-3"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.3 }}
+            
+            <Link 
+              to={`/projects/${project.slug}`} 
+              className="flex items-center gap-3 text-2xl font-semibold text-white hover:text-white/90 transition-colors mb-5 group/link"
             >
-              {/* Primary Image */}
-              <div className="flex-1 rounded-xl overflow-hidden">
-                <motion.img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-48 md:h-64 object-cover"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.5 }}
-                />
-              </div>
-              {project.image2 && (
-                <div className="flex-1 rounded-xl overflow-hidden hidden md:block">
+              <motion.span whileHover={{ x: 5 }}>{project.title}</motion.span>
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ArrowUpRight className="w-6 h-6" style={{ color: project.color }} />
+              </motion.div>
+            </Link>
+            
+            <p className="text-white/50 text-sm mb-8 leading-relaxed flex-1">{project.description}</p>
+            
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2">
+              {project.tags.slice(0, 6).map((tag, i) => (
+                <motion.span
+                  key={tag}
+                  className="px-3 py-1.5 text-xs text-white/50 bg-white/5 rounded-lg border border-white/5 hover:border-white/20 hover:text-white/70 transition-all cursor-default"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 + i * 0.05 }}
+                  whileHover={{ y: -2, backgroundColor: `${project.color}10` }}
+                >
+                  {tag}
+                </motion.span>
+              ))}
+              {project.tags.length > 6 && (
+                <span className="px-2 py-1.5 text-xs text-white/30">
+                  +{project.tags.length - 6} more
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Right Images */}
+          <div className="lg:w-3/5 relative">
+            <Link 
+              to={`/projects/${project.slug}`}
+              className="block rounded-2xl overflow-hidden relative group/image"
+            >
+              <motion.div 
+                className="flex gap-3 p-3 rounded-2xl"
+                style={{ 
+                  backgroundColor: `${project.color}08`,
+                }}
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.4 }}
+              >
+                {/* Primary Image */}
+                <div className="flex-1 rounded-xl overflow-hidden shadow-lg">
                   <motion.img
-                    src={project.image2}
-                    alt={`${project.title} 2`}
-                    className="w-full h-48 md:h-64 object-cover"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.5 }}
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-52 md:h-64 object-cover"
+                    whileHover={{ scale: 1.08 }}
+                    transition={{ duration: 0.6 }}
                   />
                 </div>
-              )}
-            </motion.div>
-            
-            {/* View Button Overlay */}
-            <motion.div 
-              className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2 bg-white text-black rounded-full text-sm font-medium shadow-lg"
-              initial={{ opacity: 0, scale: 0.8, y: -10 }}
-              animate={{ 
-                opacity: isHovered ? 1 : 0, 
-                scale: isHovered ? 1 : 0.8,
-                y: isHovered ? 0 : -10
-              }}
-              transition={{ duration: 0.2 }}
-            >
-              View
-              <ArrowRight className="w-4 h-4" />
-            </motion.div>
-            
-            {/* Colored border on hover */}
-            <motion.div 
-              className="absolute inset-0 rounded-2xl pointer-events-none"
-              style={{ 
-                border: `2px solid ${project.color}`,
-                opacity: isHovered ? 0.3 : 0
-              }}
-              transition={{ duration: 0.3 }}
-            />
-          </Link>
+                {project.image2 && (
+                  <div className="flex-1 rounded-xl overflow-hidden hidden md:block shadow-lg">
+                    <motion.img
+                      src={project.image2}
+                      alt={`${project.title} 2`}
+                      className="w-full h-52 md:h-64 object-cover"
+                      whileHover={{ scale: 1.08 }}
+                      transition={{ duration: 0.6 }}
+                    />
+                  </div>
+                )}
+              </motion.div>
+              
+              {/* View Button Overlay */}
+              <motion.div 
+                className="absolute top-5 right-5 flex items-center gap-2 px-5 py-2.5 bg-white text-black rounded-full text-sm font-semibold shadow-xl"
+                initial={{ opacity: 0, scale: 0.8, y: -15 }}
+                animate={{ 
+                  opacity: isHovered ? 1 : 0, 
+                  scale: isHovered ? 1 : 0.8,
+                  y: isHovered ? 0 : -15
+                }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+              >
+                <span>View</span>
+                <ArrowRight className="w-4 h-4" />
+              </motion.div>
+              
+              {/* Colored border glow on hover */}
+              <motion.div 
+                className="absolute inset-0 rounded-2xl pointer-events-none"
+                style={{ 
+                  boxShadow: `inset 0 0 0 2px ${project.color}`,
+                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: isHovered ? 0.4 : 0 }}
+                transition={{ duration: 0.3 }}
+              />
+            </Link>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -307,23 +332,37 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
 
 const WorkSection = () => {
   return (
-    <section id="work" className="relative z-10 px-4 py-20">
+    <section id="work" className="relative z-10 px-4 py-24">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
-          <span className="text-sm text-white/50 uppercase tracking-[0.2em]">CASE STUDIES</span>
-          <h2 className="text-4xl md:text-5xl font-light text-white mt-3">
+          <motion.span 
+            className="text-sm text-white/50 uppercase tracking-[0.25em]"
+            initial={{ opacity: 0, letterSpacing: "0.1em" }}
+            whileInView={{ opacity: 1, letterSpacing: "0.25em" }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            CASE STUDIES
+          </motion.span>
+          <motion.h2 
+            className="text-4xl md:text-5xl lg:text-6xl font-light text-white mt-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+          >
             Curated <span className="serif-italic text-pink-400">Work</span>
-          </h2>
+          </motion.h2>
         </motion.div>
 
         {/* Projects Grid */}
-        <div className="space-y-8">
+        <div className="space-y-10">
           {projects.slice(0, 5).map((project, index) => (
             <ProjectCard key={project.title} project={project} index={index} />
           ))}
@@ -331,17 +370,22 @@ const WorkSection = () => {
 
         {/* See More Link */}
         <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mt-16"
+          className="text-center mt-20"
         >
           <Link
             to="/work"
-            className="inline-flex items-center gap-2 px-6 py-3 text-white/60 hover:text-white transition-all border border-white/10 rounded-full hover:border-white/20 hover:bg-white/5"
+            className="group inline-flex items-center gap-3 px-8 py-4 text-white/70 hover:text-white transition-all border border-white/10 rounded-full hover:border-white/30 hover:bg-white/5"
           >
-            See more projects
-            <ArrowUpRight className="w-4 h-4" />
+            <span className="font-medium">See all projects</span>
+            <motion.div
+              whileHover={{ x: 5 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ArrowUpRight className="w-5 h-5" />
+            </motion.div>
           </Link>
         </motion.div>
       </div>

@@ -1,9 +1,8 @@
-import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { ArrowUpRight, Linkedin, Github, Twitter } from "lucide-react";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import aayushBlue from "@/assets/aayush-blue.webp";
-import abIcon from "@/assets/ab-icon.svg";
 
 const socials = [
   { name: "LinkedIn", url: "https://linkedin.com/in/iaayushbharti", icon: Linkedin },
@@ -13,35 +12,23 @@ const socials = [
 
 const AboutSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
-  const [isImageVisible, setIsImageVisible] = useState(true);
+  const stickRef = useRef<HTMLDivElement>(null);
+  const [stickPosition, setStickPosition] = useState(0);
   
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"]
   });
   
-  // Sticky card parallax effect
-  const y = useTransform(scrollYProgress, [0, 0.5, 1], [200, 0, -200]);
-  const rotate = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [-8, -2, 2, 8]);
-  const scale = useTransform(scrollYProgress, [0, 0.2, 0.5, 0.8, 1], [0.8, 0.95, 1, 0.95, 0.8]);
+  // Stick animation - moves horizontally based on scroll
+  const stickX = useTransform(scrollYProgress, [0.2, 0.4, 0.6, 0.8], [-200, 0, 0, 200]);
+  const imageOpacity = useTransform(scrollYProgress, [0.25, 0.35, 0.65, 0.75], [0, 1, 1, 0]);
+  const imageScale = useTransform(scrollYProgress, [0.25, 0.4, 0.6, 0.75], [0.8, 1, 1, 0.8]);
   
-  // Smooth springs for card animation
-  const smoothY = useSpring(y, { stiffness: 50, damping: 20 });
-  const smoothRotate = useSpring(rotate, { stiffness: 80, damping: 20 });
-  const smoothScale = useSpring(scale, { stiffness: 100, damping: 25 });
-  
-  // Visibility fade based on scroll position
-  const opacity = useTransform(scrollYProgress, [0, 0.15, 0.5, 0.85, 1], [0, 1, 1, 1, 0]);
-  const smoothOpacity = useSpring(opacity, { stiffness: 100, damping: 30 });
-  
-  // Track visibility
-  useEffect(() => {
-    const unsubscribe = scrollYProgress.on("change", (latest) => {
-      setIsImageVisible(latest > 0.1 && latest < 0.9);
-    });
-    return unsubscribe;
-  }, [scrollYProgress]);
+  // Smooth springs
+  const smoothStickX = useSpring(stickX, { stiffness: 100, damping: 30 });
+  const smoothImageOpacity = useSpring(imageOpacity, { stiffness: 100, damping: 30 });
+  const smoothImageScale = useSpring(imageScale, { stiffness: 100, damping: 30 });
 
   return (
     <section id="about" ref={containerRef} className="relative z-10 px-4 py-32 min-h-[120vh]">
@@ -145,103 +132,73 @@ const AboutSection = () => {
             </motion.div>
           </motion.div>
 
-          {/* Image with Sticky/Parallax Animation */}
-          <motion.div
-            ref={imageRef}
-            style={{ 
-              y: smoothY, 
-              opacity: smoothOpacity, 
-              scale: smoothScale, 
-              rotate: smoothRotate 
-            }}
-            className="relative lg:sticky lg:top-24"
-          >
+          {/* Image with Stick Animation */}
+          <div className="relative lg:sticky lg:top-24 h-[500px] flex items-center justify-center overflow-hidden">
+            {/* The Stick - vertical bar that reveals/hides image */}
+            <motion.div
+              ref={stickRef}
+              style={{ x: smoothStickX }}
+              className="absolute z-20 w-2 h-[120%] bg-gradient-to-b from-white/0 via-white to-white/0 rounded-full shadow-[0_0_30px_rgba(255,255,255,0.5)]"
+            />
+            
+            {/* Image Container */}
             <motion.div 
-              className="relative rounded-3xl overflow-hidden group"
-              whileHover={{ scale: 1.03 }}
-              transition={{ duration: 0.4 }}
-              style={{
-                boxShadow: '0 25px 80px -20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(100, 100, 200, 0.1)'
+              style={{ 
+                opacity: smoothImageOpacity,
+                scale: smoothImageScale,
               }}
+              className="relative rounded-3xl overflow-hidden"
             >
-              <img
-                src={aayushBlue}
-                alt="Aayush Bharti"
-                className="w-full h-auto rounded-3xl"
-              />
-              
-              {/* AB Logo Overlay with spring animation */}
               <motion.div 
-                className="absolute top-5 left-5 bg-white/15 backdrop-blur-xl rounded-2xl p-3 border border-white/30"
-                initial={{ opacity: 0, scale: 0, rotate: -30, x: -20 }}
-                whileInView={{ opacity: 1, scale: 1, rotate: 0, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.6, type: "spring", stiffness: 200, damping: 15 }}
-                whileHover={{ rotate: 15, scale: 1.2, x: 5, y: -5 }}
+                className="relative"
+                whileHover={{ scale: 1.03 }}
+                transition={{ duration: 0.4 }}
               >
-                <img src={abIcon} alt="AB" className="w-12 h-12" />
+                <img
+                  src={aayushBlue}
+                  alt="Aayush Bharti"
+                  className="w-full max-w-md h-auto rounded-3xl"
+                />
+                
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-3xl" />
+                
+                {/* Shine effect on hover */}
+                <motion.div 
+                  className="absolute inset-0 pointer-events-none opacity-0 hover:opacity-100 transition-opacity duration-700"
+                  style={{
+                    background: 'linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.15) 40%, rgba(255,255,255,0.1) 50%, transparent 60%)',
+                  }}
+                />
               </motion.div>
               
-              {/* Gradient overlay on hover */}
-              <motion.div 
-                className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 1 }}
-                transition={{ duration: 0.4 }}
-              />
-              
-              {/* Shine effect */}
-              <motion.div 
-                className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                style={{
-                  background: 'linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.15) 40%, rgba(255,255,255,0.1) 50%, transparent 60%)',
-                  transform: 'translateX(-100%)',
-                }}
+              {/* Decorative elements */}
+              <motion.div
+                className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 blur-xl"
                 animate={{
-                  transform: ['translateX(-100%)', 'translateX(100%)'],
+                  scale: [1, 1.2, 1],
+                  opacity: [0.5, 0.8, 0.5],
                 }}
                 transition={{
-                  duration: 1.5,
+                  duration: 4,
                   repeat: Infinity,
-                  repeatDelay: 3,
+                  ease: "easeInOut"
                 }}
               />
-              
-              {/* Border glow */}
-              <div 
-                className="absolute inset-0 rounded-3xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style={{
-                  boxShadow: 'inset 0 0 30px rgba(255, 255, 255, 0.1)'
+              <motion.div
+                className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 blur-xl"
+                animate={{
+                  scale: [1.2, 1, 1.2],
+                  opacity: [0.3, 0.6, 0.3],
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
                 }}
               />
             </motion.div>
-            
-            {/* Floating decorative elements */}
-            <motion.div
-              className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 blur-xl"
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.5, 0.8, 0.5],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-            <motion.div
-              className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 blur-xl"
-              animate={{
-                scale: [1.2, 1, 1.2],
-                opacity: [0.3, 0.6, 0.3],
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

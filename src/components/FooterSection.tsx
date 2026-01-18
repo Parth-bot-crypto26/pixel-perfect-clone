@@ -17,32 +17,6 @@ const FooterSection = forwardRef<HTMLElement>((_, ref) => {
   
   return (
     <footer ref={ref} className="relative z-10">
-      {/* Open to Work Banner - Infinite Marquee */}
-      <div className="overflow-hidden border-y border-white/10 py-5 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent">
-        <motion.div 
-          className="flex whitespace-nowrap"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ 
-            duration: 25, 
-            repeat: Infinity, 
-            ease: "linear" 
-          }}
-        >
-          {[...Array(20)].map((_, i) => (
-            <span key={i} className="flex items-center gap-6 mx-6">
-              <span className="text-2xl md:text-3xl font-light text-white/25 tracking-widest uppercase">
-                OPEN TO WORK
-              </span>
-              <span className="text-white/20">✦</span>
-              <span className="text-2xl md:text-3xl font-light text-white/25 tracking-widest uppercase">
-                AVAILABLE FOR PROJECTS
-              </span>
-              <span className="text-white/20">✦</span>
-            </span>
-          ))}
-        </motion.div>
-      </div>
-
       {/* Main Footer */}
       <div ref={containerRef} className="relative px-4 py-32 overflow-hidden">
         {/* Background Wings with parallax */}

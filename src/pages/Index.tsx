@@ -1,13 +1,11 @@
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import BentoGrid from "@/components/BentoGrid";
-import InsideScoop from "@/components/InsideScoop";
 import WorkSection from "@/components/WorkSection";
-import FeaturedProject from "@/components/FeaturedProject";
 import SkillsSection from "@/components/SkillsSection";
 import AboutSection from "@/components/AboutSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
-import UsesCard from "@/components/UsesCard";
+import ExploreSayHello from "@/components/ExploreSayHello";
 import FooterSection from "@/components/FooterSection";
 
 const Index = () => {
@@ -29,13 +27,11 @@ const Index = () => {
       <main>
         <HeroSection />
         <BentoGrid />
-        <InsideScoop />
         <WorkSection />
-        <FeaturedProject />
         <SkillsSection />
         <AboutSection />
         <TestimonialsSection />
-        <UsesCard />
+        <ExploreSayHello />
         <FooterSection />
       </main>
     </div>

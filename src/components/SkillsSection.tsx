@@ -66,9 +66,11 @@ const SkillsSection = () => {
     offset: ["start end", "end start"]
   });
   
-  // Rotation changes based on scroll direction
+  // Rotation changes based on scroll direction - both transforms defined at top level
   const rotateValue = useTransform(scrollYProgress, [0, 1], [0, 360]);
+  const rotateValueReverse = useTransform(scrollYProgress, [0, 1], [0, -360]);
   const smoothRotate = useSpring(rotateValue, { stiffness: 30, damping: 30 });
+  const smoothRotateReverse = useSpring(rotateValueReverse, { stiffness: 30, damping: 30 });
   
   // Scale the wheel based on scroll
   const wheelScale = useTransform(scrollYProgress, [0, 0.3, 0.5, 0.7, 1], [0.7, 0.9, 1.1, 1, 0.8]);
@@ -80,6 +82,9 @@ const SkillsSection = () => {
   
   // Glow intensity
   const glowIntensity = useTransform(scrollYProgress, [0.2, 0.5, 0.8], [0, 1, 0]);
+  
+  // Get the correct rotation based on scroll direction
+  const currentRotation = scrollDirection === 'down' ? smoothRotate : smoothRotateReverse;
   
   // Track scroll direction
   useEffect(() => {
@@ -154,7 +159,7 @@ const SkillsSection = () => {
           <motion.div 
             className="absolute inset-0 flex items-center justify-center"
             style={{ 
-              rotate: scrollDirection === 'down' ? smoothRotate : useTransform(smoothRotate, v => -v),
+              rotate: currentRotation,
               scale: smoothScale 
             }}
           >

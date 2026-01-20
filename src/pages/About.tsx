@@ -1,7 +1,8 @@
 import Navigation from "@/components/Navigation";
 import FooterSection from "@/components/FooterSection";
 import ExploreSayHello from "@/components/ExploreSayHello";
-import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
+import GitHubContributionGraph from "@/components/GitHubContributionGraph";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { Linkedin, Github, Twitter } from "lucide-react";
 import aayushBlue from "@/assets/aayush-blue.webp";
@@ -43,10 +44,9 @@ const rotatingCards = [
 
 // Rotating Card Stack Component with auto-rotation
 const RotatingCardStack = () => {
-  const [activeIndex, setActiveIndex] = useState(1); // Start with middle card
+  const [activeIndex, setActiveIndex] = useState(1);
   const [isHovering, setIsHovering] = useState(false);
   
-  // Auto-rotate cards
   useEffect(() => {
     if (isHovering) return;
     
@@ -145,7 +145,6 @@ const ExperienceTimeline = () => {
     offset: ["start center", "end center"]
   });
   
-  // Line height grows as user scrolls
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
   const smoothLineHeight = useSpring(lineHeight, { stiffness: 100, damping: 30 });
 
@@ -156,7 +155,7 @@ const ExperienceTimeline = () => {
       
       {/* Animated line (scrolls) */}
       <motion.div 
-        className="absolute left-0 md:left-1/2 top-0 w-px bg-gradient-to-b from-pink-500 via-purple-500 to-blue-500 md:-translate-x-1/2 origin-top"
+        className="absolute left-0 md:left-1/2 top-0 w-0.5 bg-gradient-to-b from-pink-500 via-purple-500 to-blue-500 md:-translate-x-1/2 origin-top rounded-full"
         style={{ height: smoothLineHeight }}
       />
       
@@ -363,6 +362,56 @@ const About = () => {
             </motion.div>
             
             <ExperienceTimeline />
+          </div>
+        </section>
+
+        {/* Open Source / GitHub Contributions Section */}
+        <section className="px-4 py-24">
+          <div className="max-w-7xl mx-auto">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              whileInView={{ opacity: 1 }} 
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <span className="text-sm text-white/50 uppercase tracking-[0.2em]">OPEN SOURCE</span>
+              <h2 className="text-4xl md:text-5xl font-light text-white mt-3">
+                Building in <span className="serif-italic text-pink-400">Public</span>
+              </h2>
+              <p className="text-white/50 mt-4 max-w-xl mx-auto">
+                Contributing to open-source projects and building tools that help developers worldwide
+              </p>
+            </motion.div>
+            
+            <GitHubContributionGraph />
+            
+            {/* Stats */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8"
+            >
+              {[
+                { label: "Total Stars", value: "500+" },
+                { label: "Repositories", value: "50+" },
+                { label: "Contributions", value: "1.2K+" },
+                { label: "Pull Requests", value: "100+" }
+              ].map((stat, i) => (
+                <motion.div
+                  key={stat.label}
+                  className="bg-card rounded-xl border border-white/10 p-4 text-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ borderColor: 'rgba(255,255,255,0.2)' }}
+                >
+                  <div className="text-2xl font-semibold text-white mb-1">{stat.value}</div>
+                  <div className="text-xs text-white/50">{stat.label}</div>
+                </motion.div>
+              ))}
+            </motion.div>
           </div>
         </section>
 
